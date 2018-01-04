@@ -8,15 +8,20 @@ import java.util.Collections
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.Promise
+import scala.language.postfixOps
 
-import com.google.api.client.googleapis.auth.oauth2.{ GoogleAuthorizationCodeFlow => Flow }
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.calendar.CalendarScopes
+
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
 import com.sun.net.httpserver.HttpServer
+
+import ch.awae.esgcal.ActivityReporter
+import ch.awae.esgcal.Implicit.Object2Future
 
 /**
  * Service Agent for Google OAuth2 Authentication
@@ -28,6 +33,9 @@ import com.sun.net.httpserver.HttpServer
  * @version 1.1 (2018-01-02)
  */
 class LoginAgent(implicit context: ExecutionContext) {
+  type Flow = GoogleAuthorizationCodeFlow
+  type FlowBuilder = GoogleAuthorizationCodeFlow.Builder
+
   val JSON_FACTORY = JacksonFactory.getDefaultInstance
 
   /**
@@ -36,10 +44,14 @@ class LoginAgent(implicit context: ExecutionContext) {
    * @param port - the local port the capturing http server should use (default: 8080)
    * @return a future object eventually holding the OAuth2 credentials
    */
-  def authenticate(port: Int = 8080) = for {
+  def authenticate(port: Int = 8080)(implicit report: ActivityReporter) = for {
+    _ <- (report busy "starting login...").f
     flow <- directToAuth(port)
+    _ <- (report busy "waiting for code...").f
     code <- getCode(port)
+    _ <- (report busy "waiting for token...").f
     tokn <- getToken(flow, code, port)
+    _ <- (report idle).f
   } yield {
     tokn
   }
@@ -52,7 +64,7 @@ class LoginAgent(implicit context: ExecutionContext) {
     val clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
       new InputStreamReader(this.getClass.getResourceAsStream("/client_secrets.json")));
     // set up authorization code flow
-    val flow = new Flow.Builder(
+    val flow = new FlowBuilder(
       httpTransport, JSON_FACTORY, clientSecrets,
       Collections.singleton(CalendarScopes.CALENDAR))
       .build();

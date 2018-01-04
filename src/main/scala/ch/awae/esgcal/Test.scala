@@ -1,28 +1,29 @@
 package ch.awae.esgcal
 
-import scala.util.Success
-import scala.util.Failure
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import com.google.api.services.calendar.Calendar
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.json.jackson2.JacksonFactory
-import scala.collection.convert.WrapAsScala
-import ch.awae.esgcal.agent.CalendarAgent
-import ch.awae.esgcal.agent.LoginAgent
-
 object Test extends App {
+  /*
+  implicit val reporter = ConsoleReporter
 
   val token = new LoginAgent().authenticate(8080)
 
   val tok = Await.result(token, Duration.Inf)
 
-  val calendar = new CalendarAgent(tok)
+  val calendar = new CalendarAgent(tok) with CompoundCalendarJobs
 
-  for (_ <- 1 to 10) {
-    println(Await.result(calendar.getCalendarList, Duration.Inf))
+  val res = Await.result(calendar.getCalendarPairs(" - Planung"), Duration.Inf)
+
+  val start = (new Calendar.Builder()).setDate(2018, 0, 1).build.getTime
+  val end = (new Calendar.Builder()).setDate(2019, 0, 1).build.getTime
+
+  val x = for ((c0, c1) <- res) yield {
+    println(c0.getSummary + " >> " + c1.getSummary)
+    val events = Await.result(calendar.getEventsOfCalendar(c0)(start -> end), Duration.Inf)
+    events -> (c0 -> c1)
   }
+
+  Await.result(calendar.moveEvents(x), Duration.Inf)
+  */
+
+  new GUI
 
 }
