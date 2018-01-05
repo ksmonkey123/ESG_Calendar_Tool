@@ -22,6 +22,8 @@ import com.sun.net.httpserver.HttpServer
 
 import ch.awae.esgcal.ActivityReporter
 import ch.awae.esgcal.Implicit.Object2Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
 
 /**
  * Service Agent for Google OAuth2 Authentication
@@ -44,12 +46,11 @@ class LoginAgent(implicit context: ExecutionContext) {
    * @param port - the local port the capturing http server should use (default: 8080)
    * @return a future object eventually holding the OAuth2 credentials
    */
-  def authenticate(port: Int = 8080)(implicit report: ActivityReporter) = for {
-    _ <- (report busy "starting login...").f
+  def authenticate(port: Int = 8080, maxWait: Duration)(implicit report: ActivityReporter) = for {
+    _ <- (report busy "warte auf Benutzer...").f
     flow <- directToAuth(port)
-    _ <- (report busy "waiting for code...").f
-    code <- getCode(port)
-    _ <- (report busy "waiting for token...").f
+    code <- getCode(port, maxWait)
+    _ <- (report busy "login...").f
     tokn <- getToken(flow, code, port)
     _ <- (report idle).f
   } yield {
@@ -87,13 +88,22 @@ class LoginAgent(implicit context: ExecutionContext) {
    * this local server can receive the authentication code. In any case the local
    * server will be shut down after receiving a GET request.
    */
-  private def getCode(port: Int): Future[String] =
+  private def getCode(port: Int, maxWait: Duration): Future[String] =
     try {
       val promise = Promise[String]
       val server = HttpServer.create(new InetSocketAddress(port), 0)
       server.createContext("/", new MyHandler(promise, server))
       server.setExecutor(null)
       server.start()
+      Future {
+        try {
+          Await.ready(promise.future, maxWait)
+        } catch {
+          case e: Exception =>
+            server stop 0
+            promise.tryFailure(e)
+        }
+      }
       promise.future
     } catch {
       case e: Exception => Future failed e

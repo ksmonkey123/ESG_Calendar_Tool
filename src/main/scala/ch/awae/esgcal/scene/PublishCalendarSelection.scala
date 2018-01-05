@@ -12,7 +12,8 @@ case class PublishCalendarSelection(credential: Credential, invert: Boolean) ext
         horizontal(
           label(s"Publikation ${if (invert) "widerrufen" else "erfassen"}"))),
       glue,
-      center(new JLabel(s"Kalenderauswahl")),
+      center(
+        label("Kalenderauswahl")),
       glue,
       vlock(
         horizontal(

@@ -9,9 +9,23 @@ package object scene {
 
   def glue = Box.createGlue()
 
-  def label(text: String) = new JLabel(text)
-  
-  def gap(size: Int) = Box.createRigidArea(new Dimension(size, size))
+  def label(text: String): JLabel = {
+    val l = new JLabel(text)
+    if (Globals.DEBUG) {
+      l setBackground Color.orange
+      l setOpaque true
+    }
+    l
+  }
+
+  def label(text: String, color: Color): JLabel = {
+    val l = label(text)
+    l setForeground color
+    l
+  }
+
+  def gap(size: Int) =
+    Box.createRigidArea(new Dimension(size, size))
 
   def center[T <: JComponent](x: T): T = {
     x.setAlignmentX(Component.CENTER_ALIGNMENT)

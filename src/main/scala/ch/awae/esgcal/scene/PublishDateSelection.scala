@@ -13,7 +13,8 @@ case class PublishDateSelection(credential: Credential, invert: Boolean) extends
         horizontal(
           label(s"Publikation ${if (invert) "widerrufen" else "erfassen"}"))),
       glue,
-      center(new JLabel(s"Datumsauswahl")),
+      center(
+        label("Datumsauswahl")),
       glue,
       vlock(
         horizontal(

@@ -12,7 +12,8 @@ case class PublishEventSelection(credential: Credential, invert: Boolean) extend
         horizontal(
           label(s"Publikation ${if (invert) "widerrufen" else "erfassen"}"))),
       glue,
-      center(new JLabel(s"Ereignisauswahl")),
+      center(
+        label("Ereignisauswahl")),
       glue,
       vlock(
         horizontal(

@@ -2,6 +2,6 @@ package ch.awae.esgcal
 
 object Globals {
 
-  val DEBUG: Boolean = true
+  val DEBUG: Boolean = false
 
 }

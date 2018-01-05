@@ -10,6 +10,7 @@ import ch.awae.esgcal.scene.LoginScene
 import ch.awae.esgcal.scene.glue
 import ch.awae.esgcal.scene.horizontal
 import ch.awae.esgcal.scene.vertical
+import ch.awae.esgcal.scene.label
 import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JProgressBar
@@ -28,7 +29,7 @@ class GUI extends SceneManager with ActivityReporter {
   frame.setMaximumSize(new Dimension(600, 800))
 
   val progressBar = new JProgressBar(0, 100)
-  val sta_label = new JLabel(if (Globals.DEBUG) "IDLE" else " ")
+  val sta_label = label(if (Globals.DEBUG) "IDLE" else " ")
 
   val progressPane = vertical(progressBar, horizontal(sta_label, glue))
 
