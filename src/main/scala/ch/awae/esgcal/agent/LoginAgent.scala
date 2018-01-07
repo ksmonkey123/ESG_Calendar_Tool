@@ -124,7 +124,7 @@ class LoginAgent(implicit context: ExecutionContext) {
         case e: Exception => promise failure e
       }
 
-      val response = "OK";
+      val response = "OK. Fenster kann geschlossen werden.";
       t.sendResponseHeaders(200, response.length)
       val os = t.getResponseBody
       os write response.getBytes

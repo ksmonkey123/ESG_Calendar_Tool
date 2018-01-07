@@ -2,6 +2,8 @@ package ch.awae.esgcal
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Invocation Throttler regulating the rate of code execution.
@@ -20,7 +22,7 @@ import scala.concurrent.ExecutionContext
  */
 class Throttler(cps: Int) {
 
-  private val LOCK = new Object
+  private val lock = new ReentrantLock(true)
   // milliseconds between calls
   private val delay = 1000 / cps
   private var lastCall = 0L
@@ -30,12 +32,12 @@ class Throttler(cps: Int) {
    * to accept another call
    */
   def apply[T](body: => T)(implicit context: ExecutionContext) = Future {
-    LOCK synchronized {
-      val myEntry = lastCall + delay
-      // busy wait until ready
-      while (myEntry > System.currentTimeMillis) {}
-      lastCall = System.currentTimeMillis
-    }
+    lock.lock()
+    val myEntry = lastCall + delay
+    // busy wait until ready
+    while (myEntry > System.currentTimeMillis) {}
+    lastCall = System.currentTimeMillis
+    lock.unlock()
     body
   }
 

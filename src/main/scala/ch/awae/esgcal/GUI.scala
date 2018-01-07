@@ -20,13 +20,15 @@ class GUI extends SceneManager with ActivityReporter {
 
   implicit val self = this
 
+  val logThrottle = new Throttler(5)
+
   var scenes = List[Scene](LoginScene())
 
   val frame = new JFrame("ESG Calendar Tool")
   frame.setLayout(new BorderLayout)
-  frame.setPreferredSize(new Dimension(600, 800))
-  frame.setMinimumSize(new Dimension(600, 800))
-  frame.setMaximumSize(new Dimension(600, 800))
+  frame.setPreferredSize(new Dimension(500, 700))
+  frame.setMinimumSize(new Dimension(500, 700))
+  frame.setMaximumSize(new Dimension(500, 700))
 
   val progressBar = new JProgressBar(0, 100)
   val sta_label = label(if (Globals.DEBUG) "IDLE" else " ")
@@ -51,18 +53,21 @@ class GUI extends SceneManager with ActivityReporter {
   frame.setVisible(true)
   frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
 
-  def idle: Unit = {
+  def idle: Unit = logThrottle {
+    ConsoleReporter.idle
     progressBar.setValue(0)
     progressBar.setIndeterminate(false)
     sta_label.setText(if (Globals.DEBUG) "IDLE" else " ")
   }
 
-  def busy(message: String) = {
+  def busy(message: String) = logThrottle {
+    ConsoleReporter busy message
     progressBar.setIndeterminate(true)
     sta_label.setText((if (Globals.DEBUG) "BUSY " else "") + message + " ")
   }
 
-  def working(progress: Int, message: String): Unit = {
+  def working(progress: Int, message: String): Unit = logThrottle {
+    ConsoleReporter.working(progress, message)
     progressBar.setIndeterminate(false)
     progressBar.setValue(progress)
     sta_label.setText((if (Globals.DEBUG) "WORKING " else "") + message + " ")

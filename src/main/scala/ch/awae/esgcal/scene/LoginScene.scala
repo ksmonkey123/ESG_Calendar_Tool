@@ -28,6 +28,7 @@ case class LoginScene() extends Scene {
         hcenter(
           errorLabel)))
 
+
   def mock(b: Button) = push(MainScene(null))
 
   def doLogin(b: Button) = {

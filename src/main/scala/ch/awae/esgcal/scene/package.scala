@@ -7,10 +7,18 @@ package object scene {
   import javax.swing._
   import javax.swing.border.LineBorder
 
-  def glue = Box.createGlue()
+  sealed trait Axis
+  final object Axis {
+    case object HORIZONTAL extends Axis
+    case object VERTICAL extends Axis
+  }
 
-  def label(text: String): JLabel = {
+  def glue = Box.createGlue
+
+  def label(text: String, color: Color = null) = {
     val l = new JLabel(text)
+    if (color != null)
+      l setForeground color
     if (Globals.DEBUG) {
       l setBackground Color.orange
       l setOpaque true
@@ -18,53 +26,57 @@ package object scene {
     l
   }
 
-  def label(text: String, color: Color): JLabel = {
-    val l = label(text)
-    l setForeground color
-    l
-  }
-
   def gap(size: Int) =
-    Box.createRigidArea(new Dimension(size, size))
+    Box createRigidArea new Dimension(size, size)
 
   def center[T <: JComponent](x: T): T = {
-    x.setAlignmentX(Component.CENTER_ALIGNMENT)
-    x.setAlignmentY(Component.CENTER_ALIGNMENT)
+    x setAlignmentX Component.CENTER_ALIGNMENT
+    x setAlignmentY Component.CENTER_ALIGNMENT
     x
   }
 
-  def vlock[T <: Component](element: T): T = {
-    element.setMaximumSize(new Dimension(element.getMaximumSize.width, element.getPreferredSize.height))
+  def vlock[T <: Component](element: T) = {
+    element setMaximumSize new Dimension(element.getMaximumSize.width, element.getPreferredSize.height)
     element
   }
 
-  def vertical(elements: Component*) = {
-    val panel = new JPanel
-    panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS))
-    elements foreach panel.add
-    if (Globals.DEBUG) panel.setBorder(new LineBorder(Color.RED))
-    panel
+  def hlock[T <: Component](element: T) = {
+    element setMaximumSize new Dimension(element.getPreferredSize.width, element.getMaximumSize.height)
+    element
   }
 
-  def horizontal(elements: Component*) = {
-    val panel = new JPanel
-    panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS))
-    elements foreach panel.add
-    if (Globals.DEBUG) panel.setBorder(new LineBorder(Color.BLACK))
-    panel
+  def panel(λάμδα: JPanel => Unit): JPanel = {
+    val pane = new JPanel
+    λάμδα(pane)
+    pane
   }
 
-  def hcenter(elements: Component*) = {
-    val p = horizontal(glue :: elements.toList: _*)
-    p add glue
-    p
+  def panel(axis: Axis)(elements: Component*): JPanel = {
+    import ch.awae.esgcal.scene.Axis._
+
+    val pane = new JPanel
+    pane setLayout new BoxLayout(pane, axis match {
+      case HORIZONTAL => BoxLayout.LINE_AXIS
+      case VERTICAL => BoxLayout.PAGE_AXIS
+    })
+    elements foreach pane.add
+    // DEBUGGING HINTS
+    if (Globals.DEBUG) pane setBorder new LineBorder(axis match {
+      case HORIZONTAL => Color.BLACK
+      case VERTICAL => Color.RED
+    })
+    pane
   }
 
-  def vcenter(elements: Component*) = {
-    val p = vertical(glue :: elements.toList: _*)
-    p add glue
-    p
-  }
+  def vertical(elements: Component*) = panel(Axis.VERTICAL)(elements: _*)
+
+  def horizontal(elements: Component*) = panel(Axis.HORIZONTAL)(elements: _*)
+
+  def hcenter(elements: Component*) =
+    horizontal(glue :: elements.toList ::: glue :: Nil: _*)
+
+  def vcenter(elements: Component*) =
+    vertical(glue :: elements.toList ::: glue :: Nil: _*)
 
   def button(text: String, λ: Button => Unit) = {
     new Button(text)(λ).button
