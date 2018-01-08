@@ -3,7 +3,6 @@ package ch.awae.esgcal
 import scala.concurrent.ExecutionContext
 
 import javax.swing.JPanel
-import scala.annotation.tailrec
 
 trait Scene {
 

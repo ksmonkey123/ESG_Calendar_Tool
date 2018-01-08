@@ -11,18 +11,19 @@ import ch.awae.esgcal.Navigation._
 import ch.awae.esgcal.PublishModel
 import ch.awae.esgcal.PublishModel.SelectEvents
 import ch.awae.esgcal.Scene
+import ch.awae.esgcal.FunctionalActionListeners._
 
 case class PublishCalendarSelection(data: PublishModel.SelectCalendars) extends Scene {
 
   val navigation = Navigation("Zurück", "Weiter") {
-    case (LEFT, b) => pop
-    case (RIGHT, b) => push(
-      PublishEventSelection(
-        SelectEvents(
-          data.agent,
-          data.inverted,
-          entries filter { _._1.isSelected } map { _._2 })))
+    case (LEFT, b)  => pop
+    case (RIGHT, b) => push(PublishEventSelection(SelectEvents(data.agent, data.inverted, selectedCalendars)))
   }
+
+  def selectedCalendars = for {
+    (box, model) <- entries
+    if box.isSelected
+  } yield model
 
   val errorLabel = label(" ", Color.RED)
 
@@ -33,9 +34,7 @@ case class PublishCalendarSelection(data: PublishModel.SelectCalendars) extends 
     else {
       box setEnabled false
     }
-    box addActionListener new ActionListener {
-      def actionPerformed(e: ActionEvent) = checkBoxes
-    }
+    box addActionListener { () => checkBoxes }
     (box, entry)
   }
 
@@ -43,32 +42,20 @@ case class PublishCalendarSelection(data: PublishModel.SelectCalendars) extends 
     case (box, ((from, to), events)) =>
       val color = if (events.size == 0) Color.GRAY else null
       horizontal(
-        box,
-        gap(20),
-        vertical(
-          vlock(label(s"von: ${from.getSummary} (${
-            events.size match {
-              case 0 => "keine Ereignisse"
-              case 1 => "1 Ereignis"
-              case n => s"$n Ereignisse"
-            }
-          })", color)),
-          vlock(label(s"nach: ${to.getSummary}", color))),
+        box, gap(20), vertical(vlock(label(s"von: ${from.getSummary} (${
+          events.size match {
+            case 0 => "keine Ereignisse"
+            case 1 => "1 Ereignis"
+            case n => s"$n Ereignisse"
+          }
+        })", color)), vlock(label(s"nach: ${to.getSummary}", color))),
         glue) :: gap(20) :: Nil
   }: _*)))
 
   val panel =
     vertical(
-      vlock(
-        hcenter(
-          label(s"Publikation ${if (data.inverted) "widerrufen" else "erfassen"}"))),
-      glue,
-      elements,
-      vlock(
-        hcenter(
-          errorLabel)),
-      glue,
-      navigation.panel)
+      vlock(hcenter(label(s"Publikation ${if (data.inverted) "widerrufen" else "erfassen"}"))),
+      glue, elements, vlock(hcenter(errorLabel)), glue, navigation.panel)
 
   def checkBoxes: Unit = if ((entries find (_._1.isSelected)).isEmpty) {
     errorLabel setText "Mindestens einen Kalender auswählen!"

@@ -17,15 +17,9 @@ case class LoginScene() extends Scene {
 
   val panel =
     vcenter(
-      vlock(
-        hcenter(
-          label(" "))),
-      vlock(
-        hcenter(
-          button("Login", doLogin))),
-      vlock(
-        hcenter(
-          errorLabel)))
+      vlock(hcenter(label(" "))),
+      vlock(hcenter(button("Login", doLogin))),
+      vlock(hcenter(errorLabel)))
 
   def doLogin(b: Button) = {
     b.disable

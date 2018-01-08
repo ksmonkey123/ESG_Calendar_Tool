@@ -12,19 +12,12 @@ case class MainScene(credential: Credential) extends Scene {
 
   val panel =
     vcenter(
-      center(button("Exportieren", doExport)),
-      gap(30),
-      center(button("Publizieren", doPublish(false))),
-      gap(30),
+      center(button("Exportieren", doExport)), gap(30),
+      center(button("Publizieren", doPublish(false))), gap(30),
       center(button("Publikation widerrufen", doPublish(true))))
 
   def doExport(b: Button) = ???
 
-  def doPublish(inverted: Boolean)(b: Button) =
-    push(
-      PublishDateSelection(
-        PublishModel.SelectDates(
-          new CalendarAgent(credential) with CompoundCalendarJobs,
-          inverted)))
+  def doPublish(inverted: Boolean)(b: Button) = push(PublishDateSelection(PublishModel.SelectDates(new CalendarAgent(credential) with CompoundCalendarJobs, inverted)))
 
 }

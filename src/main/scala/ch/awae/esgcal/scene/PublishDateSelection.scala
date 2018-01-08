@@ -28,7 +28,7 @@ case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
   val select_start = new DateSelection(0, 0, 3, checkDate)
   val select_end = new DateSelection(30, 11, 3, checkDate)
   val navigation = Navigation("Abbrechen", "Weiter") {
-    case (LEFT, b) => pop
+    case (LEFT, b)  => pop
     case (RIGHT, b) => fetchCalendars(b)
   }
 
@@ -37,28 +37,12 @@ case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
 
   val panel =
     vertical(
-      vlock(
-        horizontal(
-          label(s"Publikation ${if (data.inverted) "widerrufen" else "erfassen"}"))),
-      glue,
-      vlock(
-        hcenter(
-          label(" "))),
+      vlock(horizontal(label(s"Publikation ${if (data.inverted) "widerrufen" else "erfassen"}"))), glue,
+      vlock(hcenter(label(" "))),
       vertical(
-        horizontal(
-          label_start,
-          gap(10),
-          select_start.build),
-        gap(20),
-        horizontal(
-          label_end,
-          gap(10),
-          select_end.build)),
-      vlock(
-        hcenter(
-          error_label)),
-      glue,
-      navigation.panel)
+        horizontal(label_start, gap(10), select_start.build), gap(20),
+        horizontal(label_end, gap(10), select_end.build)),
+      vlock(hcenter(error_label)), glue, navigation.panel)
 
   def checkDate(): Unit =
     if (select_start.date after select_end.date) {
@@ -71,36 +55,24 @@ case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
 
   def fetchCalendars(b: Button) = {
     b.disable
-    val result =
-      data.agent.getCalendarPairs(" - Planung") map { list =>
-        report busy "lade Ereignisse..."
-        list map {
-          case (from, to) => if (data.inverted) to -> from else from -> to
-        } map {
-          case (from, to) =>
-            data.agent.getEventsOfCalendar(from)(
-              start -> new Date(end.getTime + 86400000L)) map {
-                case list => from -> to -> list
-              }
-        }
-      } flatMap {
-        Future.sequence(_)
+    val result = data.agent.getCalendarPairs(" - Planung") map { list =>
+      report busy "lade Ereignisse..."
+      for {
+        _item <- list.sortBy(_._1.getSummary)
+        (from, to) = if (data.inverted) _item.swap else _item
+        range = (start, new Date(end.getTime + 86400000L))
+      } yield {
+        data.agent.getEventsOfCalendar(from)(range) map { ((from, to), _) }
       }
+    } flatMap { Future.sequence(_) }
 
+    result onComplete { _ =>
+      report.idle
+      b.enable
+    }
     result onComplete {
-      case Success(list) =>
-        report.idle
-        b.enable
-        push(PublishCalendarSelection(PublishModel.SelectCalendars(
-          data.agent,
-          data.inverted,
-          start -> end,
-          list.sortBy(_._1._1.getSummary))))
-      case Failure(x) =>
-        report.idle
-        b.enable
-        println(x)
-        error_label.setText(s"Es ist ein Fehler aufgetreten (${x.getClass.getSimpleName})")
+      case Success(list)  => push(PublishCalendarSelection(PublishModel.SelectCalendars(data.agent, data.inverted, start -> end, list)))
+      case Failure(error) => error_label.setText(s"Es ist ein Fehler aufgetreten (${error.getClass.getSimpleName})")
     }
   }
 

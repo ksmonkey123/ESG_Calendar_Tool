@@ -2,22 +2,14 @@ package ch.awae.esgcal
 
 import scala.language.reflectiveCalls
 
-import scene._
-
 import Implicit._
+import scene._
 
 class Navigation private (_left: String, _right: String, λάμδα: (Navigation.Direction, Button) => Unit) {
 
   val left = button(_left, λάμδα(Navigation.LEFT, _))
   val right = button(_right, λάμδα(Navigation.RIGHT, _))
-  val panel =
-    vlock(
-      horizontal(
-        gap(10),
-        left,
-        glue,
-        right,
-        gap(10)))
+  val panel = vlock(horizontal(gap(10), left, glue, right, gap(10)))
 
 }
 

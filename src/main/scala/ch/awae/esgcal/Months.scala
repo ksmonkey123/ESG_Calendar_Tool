@@ -7,13 +7,14 @@ case class Month(index: Int, text: String)(λ: Int => Int) {
 
 object Month {
 
+  // Rules for the number of days per month
   private val _31 = (x: Int) => 31
   private val _30 = (x: Int) => 30
   private val _feb: Int => Int = {
     case x if x % 1000 == 0 => 29
-    case x if x % 100 == 0 => 28
-    case x if x % 4 == 0 => 29
-    case _ => 28
+    case x if x % 100 == 0  => 28
+    case x if x % 4 == 0    => 29
+    case _                  => 28
   }
 
   lazy val months = List[((Int, String), Int => Int)](

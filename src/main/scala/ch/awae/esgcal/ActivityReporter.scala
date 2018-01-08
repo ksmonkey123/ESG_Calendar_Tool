@@ -16,12 +16,9 @@ object ConsoleReporter extends ActivityReporter {
 }
 
 class AsyncReporting(reporter: ActivityReporter, steps: Int) {
-
   private var state = 0
-
   def progress(msg: String) = synchronized {
     state += 1
     reporter.working(state, steps, s"$state/$steps: $msg");
   }
-
 }

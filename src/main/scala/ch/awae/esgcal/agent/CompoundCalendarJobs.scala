@@ -1,21 +1,19 @@
 package ch.awae.esgcal.agent
 
-import scala.concurrent.Await
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 
 import com.google.api.services.calendar.model.{ CalendarListEntry => Calendar }
 import com.google.api.services.calendar.model.Event
 
-import ch.awae.esgcal.ActivityReporter
-import ch.awae.esgcal.Implicit._
+import ch.awae.esgcal.{ ActivityReporter => Rep }
 import ch.awae.esgcal.AsyncReporting
+import ch.awae.esgcal.Implicit._
 
 trait CompoundCalendarJobs {
   self: CalendarAgent =>
 
-  def getCalendarPairs(suffix: String)(implicit report: ActivityReporter): Future[List[(Calendar, Calendar)]] = {
+  def getCalendarPairs(suffix: String)(implicit report: Rep) = {
     report busy "lese Kalender..."
     self.getCalendarList map { list =>
       val length = list.size
@@ -29,9 +27,13 @@ trait CompoundCalendarJobs {
     }
   }
 
-  def moveEvents(list: List[(List[Event], (Calendar, Calendar))])(implicit report: ActivityReporter) = {
+  def moveEvents(list: List[(List[Event], Pair[Calendar])])(implicit report: Rep) = {
     report busy "Verschieben vorbereiten..."
-    val jobs = list flatMap { case (events, move) => events map { (_, move) } }
+    // flatten movement jobs
+    val jobs = for {
+      (events, movement) <- list
+      event <- events
+    } yield (event, movement)
     val size = jobs.size
     val indexedJobs = (0 until size) map { i => i -> jobs(i) }
     val logger = new AsyncReporting(report, size)

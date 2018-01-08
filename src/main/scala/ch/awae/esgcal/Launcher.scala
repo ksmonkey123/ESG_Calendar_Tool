@@ -5,6 +5,6 @@ import javax.swing.UIManager
 object Launcher extends App {
 
   UIManager setLookAndFeel UIManager.getSystemLookAndFeelClassName
-  new GUI
+  new GUI().init
 
 }

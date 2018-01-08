@@ -21,7 +21,7 @@ import ch.awae.esgcal.Scene
 case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene {
 
   val navigation = Navigation("Zurück", "Ausführen") {
-    case (LEFT, _) => pop
+    case (LEFT, _)  => pop
     case (RIGHT, b) => process(b)
   }
 
@@ -35,12 +35,9 @@ case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene 
     case (cals, events) => (cals, events map {
       case (box, event) =>
         horizontal(
-          box,
-          gap(10),
-          vertical(
-            label(event.getSummary) Λ { l =>
-              l setFont l.getFont.deriveFont(l.getFont.getSize * 1.2f).deriveFont(Font.BOLD)
-            },
+          box, gap(10), vertical(label(event.getSummary) Λ { l =>
+            l setFont l.getFont.deriveFont(l.getFont.getSize * 1.2f).deriveFont(Font.BOLD)
+          },
             label(event.getStart.toLocal.niceString + " - " + event.getEnd.toLocal.niceString))
             Λ {
               _ addMouseListener new MouseAdapter {
@@ -57,24 +54,14 @@ case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene 
   val scrolls = sections map {
     case ((from, to), panels) =>
       ((if (data.inverted) from else to).getSummary,
-        new JScrollPane(
-          hcenter(
-            hlock(
-              vertical(
-                vlock(vertical(
-                  panels.flatMap(List(_, gap(10))): _*)),
-                glue)))))
+        new JScrollPane(hcenter(hlock(vertical(vlock(vertical(panels.flatMap(List(_, gap(10))): _*)), glue)))))
   }
 
   val tabs = new JTabbedPane
 
   scrolls foreach { case (t, s) => tabs.addTab(t, s) }
 
-  val panel =
-    vertical(
-      tabs,
-      vlock(
-        navigation.panel))
+  val panel = vertical(tabs, vlock(navigation.panel))
 
   def process(b: Button) = {
     b.disable
