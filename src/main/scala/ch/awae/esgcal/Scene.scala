@@ -1,11 +1,9 @@
 package ch.awae.esgcal
 
-import java.awt.Component
-
-import javax.swing.Box
-import javax.swing.BoxLayout
-import javax.swing.JPanel
 import scala.concurrent.ExecutionContext
+
+import javax.swing.JPanel
+import scala.annotation.tailrec
 
 trait Scene {
 
@@ -27,8 +25,8 @@ trait Scene {
 
   final def lock = locked = true
   final def unlock = locked = false
-  final def push(scene: Scene) = if (!locked) _manager.push(scene)
+  final def push(scene: Scene) = if (!locked) _manager push scene
   final def pop: Unit = pop(1)
-  final def pop(levels: Int): Unit = if (!locked) _manager.pop(levels)
+  final def pop(levels: Int): Unit = if (!locked) _manager pop levels
 
 }

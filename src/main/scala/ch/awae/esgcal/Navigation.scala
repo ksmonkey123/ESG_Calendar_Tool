@@ -2,11 +2,9 @@ package ch.awae.esgcal
 
 import scala.language.reflectiveCalls
 
-import ch.awae.esgcal.scene.button
-import ch.awae.esgcal.scene.glue
-import ch.awae.esgcal.scene.horizontal
-import ch.awae.esgcal.scene.vlock
-import ch.awae.esgcal.scene.gap
+import scene._
+
+import Implicit._
 
 class Navigation private (_left: String, _right: String, λάμδα: (Navigation.Direction, Button) => Unit) {
 

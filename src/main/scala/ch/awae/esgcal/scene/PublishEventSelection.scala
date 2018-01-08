@@ -1,28 +1,93 @@
 package ch.awae.esgcal.scene
 
-import com.google.api.client.auth.oauth2.Credential
-import ch.awae.esgcal.Scene
-import javax.swing.JLabel
-import ch.awae.esgcal.Navigation
-import ch.awae.esgcal.Navigation.LEFT
-import ch.awae.esgcal.Navigation.RIGHT
+import scala.util.Failure
+import scala.util.Success
 
-case class PublishEventSelection(credential: Credential, invert: Boolean) extends Scene {
+import java.awt.Font
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+
+import javax.swing.JCheckBox
+import javax.swing.JScrollPane
+import javax.swing.JTabbedPane
+
+import ch.awae.esgcal.Button
+import ch.awae.esgcal.Implicit._
+import ch.awae.esgcal.Navigation
+import ch.awae.esgcal.Navigation._
+import ch.awae.esgcal.PublishModel
+import ch.awae.esgcal.Scene
+
+case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene {
 
   val navigation = Navigation("Zurück", "Ausführen") {
     case (LEFT, _) => pop
-    case (RIGHT, _) => pop(3)
+    case (RIGHT, b) => process(b)
   }
+
+  val model = data.calendars map {
+    case (cals, events) => (cals, events map {
+      case event => (new JCheckBox() Λ { _ setSelected !data.inverted }, event)
+    })
+  }
+
+  val sections = model map {
+    case (cals, events) => (cals, events map {
+      case (box, event) =>
+        horizontal(
+          box,
+          gap(10),
+          vertical(
+            label(event.getSummary) Λ { l =>
+              l setFont l.getFont.deriveFont(l.getFont.getSize * 1.2f).deriveFont(Font.BOLD)
+            },
+            label(event.getStart.toLocal.niceString + " - " + event.getEnd.toLocal.niceString))
+            Λ {
+              _ addMouseListener new MouseAdapter {
+                override def mouseClicked(e: MouseEvent) = {
+                  if (e.getButton == MouseEvent.BUTTON1)
+                    box.setSelected(!box.isSelected())
+                }
+              }
+            },
+          glue)
+    })
+  }
+
+  val scrolls = sections map {
+    case ((from, to), panels) =>
+      ((if (data.inverted) from else to).getSummary,
+        new JScrollPane(
+          hcenter(
+            hlock(
+              vertical(
+                vlock(vertical(
+                  panels.flatMap(List(_, gap(10))): _*)),
+                glue)))))
+  }
+
+  val tabs = new JTabbedPane
+
+  scrolls foreach { case (t, s) => tabs.addTab(t, s) }
 
   val panel =
     vertical(
+      tabs,
       vlock(
-        horizontal(
-          label(s"Publikation ${if (invert) "widerrufen" else "erfassen"}"))),
-      glue,
-      center(
-        label("Ereignisauswahl")),
-      glue,
-      navigation.panel)
+        navigation.panel))
+
+  def process(b: Button) = {
+    b.disable
+
+    val job = model map {
+      case (movement, list) =>
+        (list filter { _._1.isSelected } map { _._2 }) -> movement
+    }
+
+    data.agent.moveEvents(job).onComplete {
+      case Success(_) => pop(3)
+      case Failure(_) => pop
+    }
+  }
 
 }

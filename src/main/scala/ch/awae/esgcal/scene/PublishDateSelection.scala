@@ -1,26 +1,30 @@
 package ch.awae.esgcal.scene
 
+import scala.concurrent.Future
+import scala.util.Failure
+import scala.util.Success
+
 import java.awt.Color
+import java.util.Date
 
-import com.google.api.client.auth.oauth2.Credential
-
-import ch.awae.esgcal.DateSelection
-import ch.awae.esgcal.Scene
 import javax.swing.SwingConstants
+
+import ch.awae.esgcal.Button
+import ch.awae.esgcal.DateSelection
+import ch.awae.esgcal.Implicit._
 import ch.awae.esgcal.Navigation
 import ch.awae.esgcal.Navigation._
-import ch.awae.esgcal.Button
 import ch.awae.esgcal.PublishModel
-import scala.concurrent.Future
-import scala.util.Success
-import scala.util.Failure
-import ch.awae.esgcal.Util.List2IndexedList
+import ch.awae.esgcal.Scene
 
 case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
 
   val error_label = label(" ", Color.RED)
   val label_start = label("von:")
-  val label_end = label("bis:")
+  val label_end = label("bis:") Λ { l =>
+    l setMaximumSize label_start.getMaximumSize
+    l setHorizontalAlignment SwingConstants.TRAILING
+  }
   val select_start = new DateSelection(0, 0, 3, checkDate)
   val select_end = new DateSelection(30, 11, 3, checkDate)
   val navigation = Navigation("Abbrechen", "Weiter") {
@@ -30,9 +34,6 @@ case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
 
   def start = select_start.date
   def end = select_end.date
-
-  label_end setMaximumSize label_start.getMaximumSize
-  label_end setHorizontalAlignment SwingConstants.TRAILING
 
   val panel =
     vertical(
@@ -73,14 +74,14 @@ case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
     val result =
       data.agent.getCalendarPairs(" - Planung") map { list =>
         report busy "lade Ereignisse..."
-        val size = list.size
         list map {
           case (from, to) => if (data.inverted) to -> from else from -> to
         } map {
           case (from, to) =>
-            data.agent.getEventsOfCalendar(from)(start -> end) map {
-              case list => from -> to -> list
-            }
+            data.agent.getEventsOfCalendar(from)(
+              start -> new Date(end.getTime + 86400000L)) map {
+                case list => from -> to -> list
+              }
         }
       } flatMap {
         Future.sequence(_)

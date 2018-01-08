@@ -1,16 +1,15 @@
 package ch.awae.esgcal.scene
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
 import scala.util.Failure
 import scala.util.Success
+
+import java.awt.Color
 
 import ch.awae.esgcal.Button
 import ch.awae.esgcal.Scene
 import ch.awae.esgcal.agent.LoginAgent
-import scala.concurrent.duration.Duration
-import scala.concurrent.duration._
-import scala.language.postfixOps
-import java.awt.Color
-import java.awt.Dimension
 
 case class LoginScene() extends Scene {
 
@@ -28,14 +27,10 @@ case class LoginScene() extends Scene {
         hcenter(
           errorLabel)))
 
-
-  def mock(b: Button) = push(MainScene(null))
-
   def doLogin(b: Button) = {
     b.disable
     errorLabel setText " "
-    val agent = new LoginAgent
-    agent.authenticate(8080, 20 seconds) onComplete {
+    new LoginAgent().authenticate(8080, 20 seconds) onComplete {
       case Success(cred) => push(MainScene(cred))
       case Failure(err) =>
         errorLabel setText "Login fehlgeschlagen"

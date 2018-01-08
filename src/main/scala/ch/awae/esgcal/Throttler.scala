@@ -1,8 +1,8 @@
 package ch.awae.esgcal
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
-import java.util.concurrent.locks.Lock
+import scala.concurrent.Future
+
 import java.util.concurrent.locks.ReentrantLock
 
 /**

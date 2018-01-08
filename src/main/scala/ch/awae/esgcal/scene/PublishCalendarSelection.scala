@@ -1,22 +1,27 @@
 package ch.awae.esgcal.scene
 
-import com.google.api.client.auth.oauth2.Credential
-import ch.awae.esgcal.Scene
-import javax.swing.JLabel
-import java.util.Date
+import java.awt.Color
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+
+import javax.swing.JCheckBox
+
 import ch.awae.esgcal.Navigation
 import ch.awae.esgcal.Navigation._
 import ch.awae.esgcal.PublishModel
-import javax.swing.JCheckBox
-import java.awt.Color
-import java.awt.event.ActionListener
-import java.awt.event.ActionEvent
+import ch.awae.esgcal.PublishModel.SelectEvents
+import ch.awae.esgcal.Scene
 
 case class PublishCalendarSelection(data: PublishModel.SelectCalendars) extends Scene {
 
   val navigation = Navigation("Zurück", "Weiter") {
     case (LEFT, b) => pop
-    case (RIGHT, b) => //push(PublishEventSelection(credential, invert))
+    case (RIGHT, b) => push(
+      PublishEventSelection(
+        SelectEvents(
+          data.agent,
+          data.inverted,
+          entries filter { _._1.isSelected } map { _._2 })))
   }
 
   val errorLabel = label(" ", Color.RED)
@@ -45,7 +50,7 @@ case class PublishCalendarSelection(data: PublishModel.SelectCalendars) extends 
             events.size match {
               case 0 => "keine Ereignisse"
               case 1 => "1 Ereignis"
-              case x => s"$x Ereignisse"
+              case n => s"$n Ereignisse"
             }
           })", color)),
           vlock(label(s"nach: ${to.getSummary}", color))),

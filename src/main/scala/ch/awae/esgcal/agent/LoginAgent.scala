@@ -1,14 +1,20 @@
 package ch.awae.esgcal.agent
 
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.concurrent.Promise
+import scala.concurrent.duration.Duration
+import scala.language.postfixOps
+
 import java.awt.Desktop
 import java.io.InputStreamReader
 import java.net.InetSocketAddress
 import java.util.Collections
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.concurrent.Promise
-import scala.language.postfixOps
+import com.sun.net.httpserver.HttpExchange
+import com.sun.net.httpserver.HttpHandler
+import com.sun.net.httpserver.HttpServer
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
@@ -16,14 +22,8 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.calendar.CalendarScopes
 
-import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpHandler
-import com.sun.net.httpserver.HttpServer
-
 import ch.awae.esgcal.ActivityReporter
 import ch.awae.esgcal.Implicit.Object2Future
-import scala.concurrent.duration.Duration
-import scala.concurrent.Await
 
 /**
  * Service Agent for Google OAuth2 Authentication

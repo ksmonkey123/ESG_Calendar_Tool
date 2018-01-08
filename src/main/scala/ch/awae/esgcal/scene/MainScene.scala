@@ -3,10 +3,10 @@ package ch.awae.esgcal.scene
 import com.google.api.client.auth.oauth2.Credential
 
 import ch.awae.esgcal.Button
-import ch.awae.esgcal.Scene
 import ch.awae.esgcal.PublishModel
-import ch.awae.esgcal.agent.CompoundCalendarJobs
+import ch.awae.esgcal.Scene
 import ch.awae.esgcal.agent.CalendarAgent
+import ch.awae.esgcal.agent.CompoundCalendarJobs
 
 case class MainScene(credential: Credential) extends Scene {
 
