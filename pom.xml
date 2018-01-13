@@ -25,6 +25,12 @@
 			<artifactId>google-api-services-calendar</artifactId>
 			<version>v3-rev276-1.23.0</version>
 		</dependency>
+		<!-- Apache POI XSSF -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.17</version>
+		</dependency>
 	</dependencies>
 
 	<build>
