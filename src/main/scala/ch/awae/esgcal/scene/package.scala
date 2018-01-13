@@ -6,6 +6,7 @@ package object scene {
   import java.awt.Dimension
   import javax.swing._
   import javax.swing.border.LineBorder
+  import ch.awae.esgcal.ui.Button
 
   sealed trait Axis
   final object Axis {
@@ -57,13 +58,13 @@ package object scene {
     val pane = new JPanel
     pane setLayout new BoxLayout(pane, axis match {
       case HORIZONTAL => BoxLayout.LINE_AXIS
-      case VERTICAL => BoxLayout.PAGE_AXIS
+      case VERTICAL   => BoxLayout.PAGE_AXIS
     })
     elements foreach pane.add
     // DEBUGGING HINTS
     if (Globals.DEBUG) pane setBorder new LineBorder(axis match {
       case HORIZONTAL => Color.BLACK
-      case VERTICAL => Color.RED
+      case VERTICAL   => Color.RED
     })
     pane
   }

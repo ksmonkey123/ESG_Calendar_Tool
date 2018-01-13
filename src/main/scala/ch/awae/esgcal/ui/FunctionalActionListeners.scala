@@ -1,4 +1,4 @@
-package ch.awae.esgcal
+package ch.awae.esgcal.ui
 
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener

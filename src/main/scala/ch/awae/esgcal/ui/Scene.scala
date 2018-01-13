@@ -1,8 +1,8 @@
-package ch.awae.esgcal
+package ch.awae.esgcal.ui
 
 import scala.concurrent.ExecutionContext
-
 import javax.swing.JPanel
+import ch.awae.esgcal.ActivityReporter
 
 trait Scene {
 

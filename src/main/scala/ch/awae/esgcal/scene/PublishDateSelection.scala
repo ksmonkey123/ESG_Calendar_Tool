@@ -9,13 +9,13 @@ import java.util.Date
 
 import javax.swing.SwingConstants
 
-import ch.awae.esgcal.Button
-import ch.awae.esgcal.DateSelection
+import ch.awae.esgcal.ui.Button
+import ch.awae.esgcal.ui.DateSelection
 import ch.awae.esgcal.Implicit._
-import ch.awae.esgcal.Navigation
-import ch.awae.esgcal.Navigation._
+import ch.awae.esgcal.ui.Navigation
+import ch.awae.esgcal.ui.Navigation._
 import ch.awae.esgcal.PublishModel
-import ch.awae.esgcal.Scene
+import ch.awae.esgcal.ui.Scene
 
 case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
 

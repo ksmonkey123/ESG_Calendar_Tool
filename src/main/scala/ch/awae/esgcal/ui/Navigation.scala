@@ -1,9 +1,8 @@
-package ch.awae.esgcal
+package ch.awae.esgcal.ui
 
 import scala.language.reflectiveCalls
-
-import Implicit._
-import scene._
+import ch.awae.esgcal.Implicit._
+import ch.awae.esgcal.scene._
 
 class Navigation private (_left: String, _right: String, λάμδα: (Navigation.Direction, Button) => Unit) {
 

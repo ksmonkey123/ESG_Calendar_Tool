@@ -1,16 +1,14 @@
-package ch.awae.esgcal
+package ch.awae.esgcal.ui
 
-import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import java.awt.BorderLayout
 import java.awt.Dimension
-
 import javax.swing.JFrame
 import javax.swing.JProgressBar
 import javax.swing.border.EmptyBorder
-
 import ch.awae.esgcal.scene._
+import ch.awae.esgcal.ActivityReporter
+import ch.awae.esgcal.ConsoleReporter
 
 class GUI extends SceneManager with ActivityReporter {
   implicit val self = this
@@ -44,7 +42,7 @@ class GUI extends SceneManager with ActivityReporter {
     updateScene
   }
 
-  def pop(levels: Int) = (levels, scenes.size) match {
+  def pop(levels: Int): Unit = (levels, scenes.size) match {
     case (_, 1) =>
     case (0, _) => updateScene
     case (x, _) => scenes = scenes.tail; pop(x - 1)

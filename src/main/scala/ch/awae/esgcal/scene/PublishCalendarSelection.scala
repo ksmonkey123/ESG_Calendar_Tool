@@ -6,12 +6,12 @@ import java.awt.event.ActionListener
 
 import javax.swing.JCheckBox
 
-import ch.awae.esgcal.Navigation
-import ch.awae.esgcal.Navigation._
+import ch.awae.esgcal.ui.Navigation
+import ch.awae.esgcal.ui.Navigation._
 import ch.awae.esgcal.PublishModel
 import ch.awae.esgcal.PublishModel.SelectEvents
-import ch.awae.esgcal.Scene
-import ch.awae.esgcal.FunctionalActionListeners._
+import ch.awae.esgcal.ui.Scene
+import ch.awae.esgcal.ui.FunctionalActionListeners._
 
 case class PublishCalendarSelection(data: PublishModel.SelectCalendars) extends Scene {
 

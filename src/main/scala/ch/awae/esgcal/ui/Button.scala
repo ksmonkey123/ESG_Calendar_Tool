@@ -1,8 +1,7 @@
-package ch.awae.esgcal
+package ch.awae.esgcal.ui
 
 import javax.swing.JButton
-
-import ch.awae.esgcal.FunctionalActionListeners._
+import ch.awae.esgcal.ui.FunctionalActionListeners._
 import ch.awae.esgcal.Implicit.ArbitraryObjectPipelining
 
 class Button(text: String)(λ: Button => Unit) {

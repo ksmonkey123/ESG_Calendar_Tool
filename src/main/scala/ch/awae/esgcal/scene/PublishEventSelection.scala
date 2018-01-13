@@ -11,12 +11,12 @@ import javax.swing.JCheckBox
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 
-import ch.awae.esgcal.Button
+import ch.awae.esgcal.ui.Button
 import ch.awae.esgcal.Implicit._
-import ch.awae.esgcal.Navigation
-import ch.awae.esgcal.Navigation._
+import ch.awae.esgcal.ui.Navigation
+import ch.awae.esgcal.ui.Navigation._
 import ch.awae.esgcal.PublishModel
-import ch.awae.esgcal.Scene
+import ch.awae.esgcal.ui.Scene
 
 case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene {
 

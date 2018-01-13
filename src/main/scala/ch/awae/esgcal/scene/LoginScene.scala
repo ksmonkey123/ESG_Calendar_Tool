@@ -7,8 +7,8 @@ import scala.util.Success
 
 import java.awt.Color
 
-import ch.awae.esgcal.Button
-import ch.awae.esgcal.Scene
+import ch.awae.esgcal.ui.Button
+import ch.awae.esgcal.ui.Scene
 import ch.awae.esgcal.agent.LoginAgent
 
 case class LoginScene() extends Scene {
@@ -24,7 +24,7 @@ case class LoginScene() extends Scene {
   def doLogin(b: Button) = {
     b.disable
     errorLabel setText " "
-    new LoginAgent().authenticate(8080, 20 seconds) onComplete {
+    new LoginAgent().authenticate(8080, 120 seconds) onComplete {
       case Success(cred) => push(MainScene(cred))
       case Failure(err) =>
         errorLabel setText "Login fehlgeschlagen"

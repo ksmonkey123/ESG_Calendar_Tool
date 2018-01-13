@@ -1,15 +1,13 @@
-package ch.awae.esgcal
+package ch.awae.esgcal.ui
 
 import scala.language.postfixOps
-
 import java.util.Calendar
-
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
-
-import ch.awae.esgcal.FunctionalActionListeners._
+import ch.awae.esgcal.ui.FunctionalActionListeners._
 import ch.awae.esgcal.Implicit._
 import ch.awae.esgcal.scene._
+import ch.awae.esgcal.Month
 
 class DateSelection(day: Int, month: Int, year: Int, λ: () => Unit = () => {}) {
 
