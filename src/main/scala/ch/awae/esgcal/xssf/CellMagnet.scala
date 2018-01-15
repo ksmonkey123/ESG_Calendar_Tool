@@ -2,11 +2,17 @@ package ch.awae.esgcal.xssf
 
 import org.apache.poi.xssf.usermodel.XSSFCell
 import scala.util.Try
+import java.util.Date
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.CellStyle
 
-trait CellMagnet[T] {
+trait CellReadMagnet[T] {
   def read(cell: XSSFCell): Option[T]
+}
+trait CellWriteMagnet[T] {
   def write(cell: XSSFCell, value: T): Unit
 }
+trait CellMagnet[T] extends CellReadMagnet[T] with CellWriteMagnet[T]
 
 object CellMagnet {
   implicit object StringMagnet extends CellMagnet[String] {
@@ -24,8 +30,7 @@ object CellMagnet {
     def write(cell: XSSFCell, value: Double) = cell.setCellValue(value)
   }
 
-  implicit object IntMagnet extends CellMagnet[Int] {
-    def read(cell: XSSFCell): Option[Int] = Try { cell.getNumericCellValue.toInt }.toOption
+  implicit object IntMagnet extends CellWriteMagnet[Int] {
     def write(cell: XSSFCell, value: Int) = cell.setCellValue(value)
   }
 

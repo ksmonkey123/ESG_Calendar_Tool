@@ -3,6 +3,7 @@ package ch.awae.esgcal
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.language.implicitConversions
+import scala.language.reflectiveCalls
 
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -58,6 +59,12 @@ object Implicit {
       s"$dow, ${date.getDayOfMonth}.${date.getMonthValue}.${date.getYear} ${date.toLocalTime.toString}"
     }
 
+  }
+
+  implicit class UseCloseable[T <: { def close(): Unit }](val resource: T) extends AnyVal {
+    def use[U](λ: T => U) =
+      try λ(resource)
+      finally resource.close()
   }
 
 }
