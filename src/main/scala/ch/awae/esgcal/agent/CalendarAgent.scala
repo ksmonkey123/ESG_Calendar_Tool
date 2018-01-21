@@ -45,11 +45,12 @@ class CalendarAgent(credentials: Credential)(implicit protected val context: Exe
     val (from, to) = range
     require(from before to)
 
-    (calendar.getId #> API.events.list)
-      .setTimeMin(new DateTime(from))
-      .setTimeMax(new DateTime(to))
-      .execute
-      .getItems #> JList2SList
+    JList2SList(
+      API.events.list(calendar.getId)
+        .setTimeMin(new DateTime(from))
+        .setTimeMax(new DateTime(to))
+        .execute
+        .getItems)
   }
 
   def moveEvent(event: Event)(movement: Pair[Calendar]) = throttle {

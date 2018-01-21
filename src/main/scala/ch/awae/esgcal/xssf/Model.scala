@@ -7,6 +7,10 @@ import scala.reflect.ClassTag
 import java.io.OutputStream
 import ch.awae.esgcal.Implicit.UseCloseable
 import java.io.FileOutputStream
+import org.apache.poi.openxml4j.opc.OPCPackage
+import java.io.File
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator
+import ch.awae.esgcal.export.Entry
 
 class Decorated[T](val raw: T)
 
@@ -26,11 +30,18 @@ class Workbook private (private val workbook: XSSFWorkbook) extends Decorated(wo
   // write the workbook
   def write(file: String): Unit = write(new FileOutputStream(file))
   def write(stream: OutputStream): Unit = stream use workbook.write
+  // evaluate all formulas
+  def evaluateAll = XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook)
 }
 
 object Workbook {
   def from(workbook: XSSFWorkbook) = new Workbook(workbook)
   def empty = new Workbook(new XSSFWorkbook)
+  def from(file: String) = {
+    val wb = new XSSFWorkbook(new File(file))
+    new Workbook(wb)
+  }
+  def fromResource(file: String) = new Workbook(new XSSFWorkbook(classOf[Workbook].getClassLoader.getResourceAsStream(file)))
 }
 
 class Sheet(private val sheet: XSSFSheet) extends Decorated(sheet) {
@@ -40,10 +51,18 @@ class Sheet(private val sheet: XSSFSheet) extends Decorated(sheet) {
     new Cell(Option(_row.getCell(col)).getOrElse(_row.createCell(col)))
   }
   def update[T: CellWriteMagnet](row: Int, col: Int, value: T) = apply(row, col).set(value)
+  def process(entry: Entry[_]) = entry.process(this)
 }
 
 class Cell(private val cell: XSSFCell) extends Decorated(cell) {
   def apply[T: CellReadMagnet] = get
   def get[T: CellReadMagnet] = implicitly[CellReadMagnet[T]].read(cell)
-  def set[T: CellWriteMagnet](value: T) = implicitly[CellWriteMagnet[T]].write(cell, value)
+  def set[T: CellWriteMagnet](value: T) = {
+    val row = cell.getRowIndex
+    val col = cell.getColumnIndex
+    val sheet = cell.getSheet.getSheetName
+    println(s"$sheet($col,$row) = $value")
+    implicitly[CellWriteMagnet[T]].write(cell, value)
+  }
+
 }

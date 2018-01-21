@@ -23,7 +23,7 @@ trait CompoundCalendarJobs {
         cal_1 <- list
         if cal_0 != cal_1
         if (cal_0.getSummary + suffix) == cal_1.getSummary
-      } yield cal_1 -> cal_0) Λ { _ => report.idle }
+      } yield cal_1 -> cal_0) tweak { _ => report.idle }
     }
   }
 
@@ -42,7 +42,7 @@ trait CompoundCalendarJobs {
         logger progress s"verschiebe '${event.getSummary}' nach '${to.getSummary}'..."
         self.doMoveEvent(event)(from -> to)
       }
-    }) map { _.toList } Λ { _ onComplete { _ => report.idle } }
+    }) map { _.toList } tweak { _ onComplete { _ => report.idle } }
   }
 
 }

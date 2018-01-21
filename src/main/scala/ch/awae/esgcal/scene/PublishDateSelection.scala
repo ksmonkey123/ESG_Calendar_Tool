@@ -21,7 +21,7 @@ case class PublishDateSelection(data: PublishModel.SelectDates) extends Scene {
 
   val error_label = label(" ", Color.RED)
   val label_start = label("von:")
-  val label_end = label("bis:") Λ { l =>
+  val label_end = label("bis:") tweak { l =>
     l setMaximumSize label_start.getMaximumSize
     l setHorizontalAlignment SwingConstants.TRAILING
   }

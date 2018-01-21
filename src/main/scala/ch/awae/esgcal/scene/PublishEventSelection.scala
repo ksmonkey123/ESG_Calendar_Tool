@@ -27,7 +27,7 @@ case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene 
 
   val model = data.calendars map {
     case (cals, events) => (cals, events map {
-      case event => (new JCheckBox() Λ { _ setSelected !data.inverted }, event)
+      case event => (new JCheckBox() tweak { _ setSelected !data.inverted }, event)
     })
   }
 
@@ -35,11 +35,11 @@ case class PublishEventSelection(data: PublishModel.SelectEvents) extends Scene 
     case (cals, events) => (cals, events map {
       case (box, event) =>
         horizontal(
-          box, gap(10), vertical(label(event.getSummary) Λ { l =>
+          box, gap(10), vertical(label(event.getSummary) tweak { l =>
             l setFont l.getFont.deriveFont(l.getFont.getSize * 1.2f).deriveFont(Font.BOLD)
           },
             label(event.getStart.toLocal.niceString + " - " + event.getEnd.toLocal.niceString))
-            Λ {
+            tweak {
               _ addMouseListener new MouseAdapter {
                 override def mouseClicked(e: MouseEvent) = {
                   if (e.getButton == MouseEvent.BUTTON1)

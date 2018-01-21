@@ -5,6 +5,9 @@ import scala.util.Try
 import java.util.Date
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.CellStyle
+import java.time.LocalDate
+import org.apache.poi.ss.usermodel.DateUtil
+import java.util.Calendar
 
 trait CellReadMagnet[T] {
   def read(cell: XSSFCell): Option[T]
@@ -17,7 +20,9 @@ trait CellMagnet[T] extends CellReadMagnet[T] with CellWriteMagnet[T]
 object CellMagnet {
   implicit object StringMagnet extends CellMagnet[String] {
     def read(cell: XSSFCell): Option[String] = Try { cell.getStringCellValue }.toOption
-    def write(cell: XSSFCell, value: String) = cell.setCellValue(value)
+    def write(cell: XSSFCell, value: String) = {
+      cell.setCellValue(value)
+    }
   }
 
   implicit object BooleanMagnet extends CellMagnet[Boolean] {
@@ -32,6 +37,18 @@ object CellMagnet {
 
   implicit object IntMagnet extends CellWriteMagnet[Int] {
     def write(cell: XSSFCell, value: Int) = cell.setCellValue(value)
+  }
+
+  implicit object LocalDateMagnet extends CellWriteMagnet[LocalDate] {
+    def write(cell: XSSFCell, value: LocalDate) = {
+      val offset =
+        if (cell.getSheet.getWorkbook.isDate1904)
+          LocalDate.of(1903, 12, 31)
+        else
+          LocalDate.of(1899, 12, 31)
+      val day = value.toEpochDay - offset.toEpochDay + 1
+      cell.setCellValue(day)
+    }
   }
 
 }

@@ -11,10 +11,10 @@ object Month {
   private val _31 = (x: Int) => 31
   private val _30 = (x: Int) => 30
   private val _feb: Int => Int = {
-    case x if x % 1000 == 0 => 29
-    case x if x % 100 == 0  => 28
-    case x if x % 4 == 0    => 29
-    case _                  => 28
+    case x if x % 400 == 0 => 29
+    case x if x % 100 == 0 => 28
+    case x if x % 4 == 0   => 29
+    case _                 => 28
   }
 
   lazy val months = List[((Int, String), Int => Int)](
@@ -30,4 +30,7 @@ object Month {
     9 -> "Oktober" -> _31,
     10 -> "November" -> _30,
     11 -> "Dezember" -> _31) map { case ((i, t), λ) => Month(i, t)(λ) }
+
+  def get(month: Int) = Month.months(month - 1)
+
 }

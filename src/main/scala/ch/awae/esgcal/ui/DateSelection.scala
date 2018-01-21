@@ -8,6 +8,7 @@ import ch.awae.esgcal.ui.FunctionalActionListeners._
 import ch.awae.esgcal.Implicit._
 import ch.awae.esgcal.scene._
 import ch.awae.esgcal.Month
+import java.time.LocalDate
 
 class DateSelection(day: Int, month: Int, year: Int, λ: () => Unit = () => {}) {
 
@@ -44,6 +45,10 @@ class DateSelection(day: Int, month: Int, year: Int, λ: () => Unit = () => {}) 
     cb_days.getSelectedIndex + 1)
     .build.getTime
 
-  def build = horizontal(cb_days, cb_months, cb_years) #> vlock #> hlock
+  def localDate = LocalDate.of(cb_years.getSelectedItem.asInstanceOf[String].toInt,
+    cb_months.getSelectedItem.asInstanceOf[Month].index + 1,
+    cb_days.getSelectedIndex + 1)
+
+  def build = hlock(vlock(horizontal(cb_days, cb_months, cb_years)))
 
 }

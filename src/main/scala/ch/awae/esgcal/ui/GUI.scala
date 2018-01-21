@@ -1,20 +1,25 @@
 package ch.awae.esgcal.ui
 
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import java.awt.BorderLayout
 import java.awt.Dimension
+
 import javax.swing.JFrame
 import javax.swing.JProgressBar
 import javax.swing.border.EmptyBorder
-import ch.awae.esgcal.scene._
+
 import ch.awae.esgcal.ActivityReporter
 import ch.awae.esgcal.ConsoleReporter
+import ch.awae.esgcal.Globals
+import ch.awae.esgcal.agent.SaveFileAgent
+import ch.awae.esgcal.scene._
 
 class GUI extends SceneManager with ActivityReporter {
   implicit val self = this
 
   // ==== Base Frame ====
-  val frame = new JFrame("ESG Calendar Tool")
+  val frame = new JFrame(s"ESG Calendar Tool (v${Globals.VERSION})")
   frame setLayout new BorderLayout
   frame setPreferredSize new Dimension(500, 700)
   frame setMinimumSize new Dimension(500, 700)
@@ -48,6 +53,8 @@ class GUI extends SceneManager with ActivityReporter {
     case (x, _) => scenes = scenes.tail; pop(x - 1)
   }
 
+  def popTo(level: Int) = while (scenes.size > level + 1) pop(1)
+
   private var currentScene: Scene = _
   private def updateScene = synchronized {
     if (currentScene != scenes.head) {
@@ -63,6 +70,10 @@ class GUI extends SceneManager with ActivityReporter {
       frame.repaint()
       currentScene = scene
     }
+  }
+
+  def getFileSaveLocation(file: String) = {
+    SaveFileAgent.getFile(file, frame)
   }
 
   // ==== ActivityReporting ====

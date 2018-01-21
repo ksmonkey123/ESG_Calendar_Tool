@@ -27,5 +27,16 @@ trait Scene {
   final def push(scene: Scene) = if (!locked) _manager push scene
   final def pop: Unit = pop(1)
   final def pop(levels: Int): Unit = if (!locked) _manager pop levels
+  final def popTo(level: Int): Unit = if (!locked) _manager popTo level
+  final def getFileSaveLocation(file: String = null, suffix: String = null): Option[String] =
+    _manager.getFileSaveLocation((file, suffix) match {
+      case (null, null) => "*"
+      case (null, suff) => "*" + suff
+      case (file, _)    => file
+    }) map {
+      case file if suffix == null        => file
+      case file if file.endsWith(suffix) => file
+      case file                          => file + suffix
+    }
 
 }
