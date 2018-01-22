@@ -10,6 +10,7 @@ import java.awt.Color
 import ch.awae.esgcal.ui.Button
 import ch.awae.esgcal.ui.Scene
 import ch.awae.esgcal.agent.LoginAgent
+import ch.awae.esgcal.Property
 
 case class LoginScene() extends Scene {
 
@@ -24,13 +25,15 @@ case class LoginScene() extends Scene {
   def doLogin(b: Button) = {
     b.disable
     errorLabel setText " "
-    new LoginAgent().authenticate(8080, 120 seconds) onComplete {
-      case Success(cred) => push(MainScene(cred))
-      case Failure(err) =>
-        errorLabel setText "Login fehlgeschlagen"
-        report.idle
-        b.enable
-    }
+    new LoginAgent().authenticate(
+      Property("login.port")[Int],
+      Property("login.timeout")[Int] seconds) onComplete {
+        case Success(cred) => push(MainScene(cred))
+        case Failure(err) =>
+          errorLabel setText "Login fehlgeschlagen"
+          report.idle
+          b.enable
+      }
   }
 
 }

@@ -17,6 +17,7 @@ import com.google.api.services.calendar.model.Event
 
 import ch.awae.esgcal.Implicit._
 import ch.awae.esgcal.Throttler
+import ch.awae.esgcal.Property
 
 /**
  * Google Calendar API Service Agent
@@ -35,7 +36,7 @@ class CalendarAgent(credentials: Credential)(implicit protected val context: Exe
   private val JSON_FACTORY = JacksonFactory.getDefaultInstance
   private val httpTransport = GoogleNetHttpTransport.newTrustedTransport
   private val API = new CalendarService.Builder(httpTransport, JSON_FACTORY, credentials).setApplicationName("ESG Calendar Tool").build
-  protected val throttle = new Throttler(5)
+  protected val throttle = new Throttler(Property("calendar.api.throttle")[Int])
 
   def getCalendarList: Future[List[Calendar]] = throttle {
     API.calendarList.list.execute.getItems
