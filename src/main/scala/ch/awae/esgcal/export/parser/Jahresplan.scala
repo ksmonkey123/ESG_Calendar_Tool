@@ -23,6 +23,14 @@ object Jahresplan extends EventParser {
   }
 
   val parser: Parser = {
+    case (a, s) if s.endsWith(" ?") => {
+      val (c, t) = baseparser(a, s.substring(0, s.length - 2))
+      c -> (t + " ?")
+    }
+    case x => baseparser(x)
+  }
+
+  val baseparser: Parser = {
     case (Bern, "Probe und Vesper")                       => 'Termin -> "na"
     case (Bern, "Probe und Kantatenvesper")               => 'Termin -> "na"
     case (Bern, "Abendprobe")                             => 'Termin -> "ab"
